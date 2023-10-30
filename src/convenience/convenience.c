@@ -33,8 +33,9 @@
 #endif
 
 #include <math.h>
-
+#include <time.h>
 #include "rtl-sdr.h"
+#include <sys/timex.h>
 
 double atofs(char *s)
 /* standard suffixes */
@@ -139,11 +140,22 @@ int nearest_gain(rtlsdr_dev_t *dev, int target_gain)
 int verbose_set_frequency(rtlsdr_dev_t *dev, uint32_t frequency)
 {
 	int r;
+	struct ntptimeval ntv;
+   	
 	r = rtlsdr_set_center_freq(dev, frequency);
+
+    	if (ntp_gettime(&ntv) == 0) {
+        // NTP time is in ntv.time
+        	printf("NTP Time: %ld seconds, %ld microseconds\n", ntv.time.tv_sec, ntv.time.tv_usec);
+    	} else {
+        	printf("Failed to get NTP time\n");
+    	}
+
+	
 	if (r < 0) {
 		fprintf(stderr, "WARNING: Failed to set center freq.\n");
 	} else {
-		fprintf(stderr, "Tuned to %u Hz.\n", frequency);
+		fprintf(stderr, "Tuned2 to %u Hz.\n", frequency);
 	}
 	return r;
 }
